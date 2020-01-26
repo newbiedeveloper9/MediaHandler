@@ -1,0 +1,70 @@
+<Window x:Class="MediaHandler.Views.ShellView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:cal="http://www.caliburnproject.org"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+
+        cal:Bind.AtDesignTime="True"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:viewModels="clr-namespace:MediaHandler.ViewModels"
+        xmlns:models="clr-namespace:MediaHandler.Models"
+        xmlns:converters="clr-namespace:Converters"
+        mc:Ignorable="d" 
+        d:DataContext="{d:DesignInstance Type=viewModels:ShellViewModel, IsDesignTimeCreatable=True}"
+        d:DesignHeight="500" d:DesignWidth="720">
+
+    <Grid>
+        <ItemsControl x:Name="ThreadCollection">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="models:ThreadPreviewModel">
+                    <materialDesign:Card Background="{Binding Color}" 
+                                         materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                                     cal:Message.Attach="[Event MouseUp]=[Action OpenThread($dataContext)]" Cursor="Hand"
+                                     Margin="8" Padding="8">
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="{Binding Thread.name}" 
+                                   FontSize="20" FontWeight="DemiBold"
+                                   HorizontalAlignment="Left">
+                                    <TextBlock.Effect>
+                                        <DropShadowEffect ShadowDepth="1" BlurRadius="1" RenderingBias="Performance"/>
+                                    </TextBlock.Effect>
+                                </TextBlock>
+
+                                <TextBlock Text="{Binding Date, StringFormat=HH:mm}" FontSize="14"  Margin="12 0 0 0"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                            </DockPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0 8 0 0">
+                                <TextBlock Text="{Binding LastMessage.Author}" FontSize="16"/>
+                                <TextBlock FontSize="16" Text=": "/>
+
+                                <TextBlock Text="{Binding LastMessage.Text}"
+                                           MaxWidth="200" MaxHeight="72" TextTrimming="CharacterEllipsis" TextWrapping="WrapWithOverflow" FontSize="16"/>
+                            </StackPanel>
+
+                                <TextBlock Text="Odczytano" HorizontalAlignment="Right"
+                                   FontStyle="Oblique" FontWeight="Light" FontSize="14"
+                                   Visibility="{Binding LastMessage.IsRead, Converter={converters:BoolVisibilityConverter}}"
+                                   Margin="0 8 0 0"/>
+                        </StackPanel>
+                    </materialDesign:Card>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+
+</Window>
