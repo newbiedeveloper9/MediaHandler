@@ -11,9 +11,9 @@ namespace MediaHandler.Services
         public FB_Thread Thread { get; set; }
         private readonly FbClient _fbClient;
 
-        public FbThreadService(MessengerClient fbClient)
+        public FbThreadService(FbClient fbClient)
         {
-            _fbClient = (FbClient)fbClient;
+            _fbClient = fbClient;
         }
 
         public async Task SendMessage(FB_Message message)

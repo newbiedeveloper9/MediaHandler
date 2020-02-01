@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Media;
 using Caliburn.Micro;
 
@@ -6,27 +7,15 @@ namespace MediaHandler.Models
 {
     public class MessageModel : PropertyChangedBase
     {
-        private int _id;
-        public int Id
+        private BindableCollection<string> _texts = new BindableCollection<string>();
+        public BindableCollection<string> Texts
         {
-            get => _id;
+            get => _texts;
             set
             {
-                if (_id == value) return;
-                _id = value;
-                NotifyOfPropertyChange(() => Id);
-            }
-        }
-
-        private string _text;
-        public string Text
-        {
-            get => _text;
-            set
-            {
-                if (_text == value) return;
-                _text = value;
-                NotifyOfPropertyChange(() => Text);
+                if (_texts == value) return;
+                _texts = value;
+                NotifyOfPropertyChange(() => Texts);
             }
         }
 
@@ -63,18 +52,6 @@ namespace MediaHandler.Models
                 if (_isOwnMessage == value) return;
                 _isOwnMessage = value;
                 NotifyOfPropertyChange(() => IsOwnMessage);
-            }
-        }
-
-        private bool _separator;
-        public bool Separator
-        {
-            get => _separator;
-            set
-            {
-                if (_separator == value) return;
-                _separator = value;
-                NotifyOfPropertyChange(() => Separator);
             }
         }
     }

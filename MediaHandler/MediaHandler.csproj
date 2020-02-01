@@ -176,10 +176,14 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\ThreadViewModel.xaml.cs">
-      <DependentUpon>ThreadViewModel.xaml</DependentUpon>
+    <Compile Include="Views\ThreadView.xaml.cs">
+      <DependentUpon>ThreadView.xaml</DependentUpon>
     </Compile>
-    <Page Include="Views\ThreadViewModel.xaml">
+    <Page Include="Themes\TextboxChat.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ThreadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
