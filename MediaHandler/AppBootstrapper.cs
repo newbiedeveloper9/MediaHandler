@@ -1,14 +1,14 @@
-using fbchat_sharp.API;
+using System.Windows.Input;
 using MediaHandler.Extensions;
+using MediaHandler.Input;
 using MediaHandler.Interfaces;
 using MediaHandler.Services;
 using MediaHandler.ViewModels;
+using System;
+using System.Collections.Generic;
+using Caliburn.Micro;
 
 namespace MediaHandler {
-    using System;
-    using System.Collections.Generic;
-    using Caliburn.Micro;
-
     public class AppBootstrapper : BootstrapperBase {
         SimpleContainer container;
 
@@ -28,6 +28,41 @@ namespace MediaHandler {
 
             container.PerRequest<IShell, ShellViewModel>();
             container.PerRequest<IThread, ThreadViewModel>();
+
+            KeysAndGestures();
+        }
+
+        private void KeysAndGestures()
+        {
+            var defaultCreateTrigger = Parser.CreateTrigger;
+
+            //Create key gestures like ctrl+k
+            Parser.CreateTrigger = (target, triggerText) =>
+            {
+                if (triggerText == null)
+                {
+                    return defaultCreateTrigger(target, null);
+                }
+
+                var triggerDetail = triggerText
+                    .Replace("[", string.Empty)
+                    .Replace("]", string.Empty);
+
+                var splits = triggerDetail.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+
+                switch (splits[0])
+                {
+                    case "Key":
+                        var key = (Key)Enum.Parse(typeof(Key), splits[1], true);
+                        return new KeyTrigger { Key = key };
+
+                    case "Gesture":
+                        var mkg = (MultiKeyGesture)(new MultiKeyGestureConverter()).ConvertFrom(splits[1]);
+                        return new KeyTrigger { Modifiers = mkg.KeySequences[0].Modifiers, Key = mkg.KeySequences[0].Keys[0] };
+                }
+
+                return defaultCreateTrigger(target, triggerText);
+            };
         }
 
         protected override object GetInstance(Type service, string key) {

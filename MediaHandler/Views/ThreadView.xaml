@@ -96,7 +96,7 @@
                          VerticalScrollBarVisibility="Auto"
                          SpellCheck.IsEnabled="True"
                          x:Name="ChatMessage"
-                         cal:Message.Attach="[Key Enter]=[SendChatMessage(ChatMessage.Text)];"
+                         cal:Message.Attach="[Key Enter]=[Action SendChatMessage()];"
                          materialDesign:HintAssist.Hint="Wpisz wiadomość..."/>
             <!--PreviewKeyDown="Message_OnPreviewKeyDown"-->
         </Grid>

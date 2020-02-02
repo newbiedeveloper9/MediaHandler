@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Caliburn.Micro;
+using fbchat_sharp.API;
 using JetBrains.Annotations;
 using MediaHandler.Interfaces;
 using MediaHandler.Models;
@@ -22,6 +23,8 @@ namespace MediaHandler.ViewModels
         bool disposed = false;
 
         private ScrollViewerLogic _scrollViewerLogic;
+        private string ThreadId => FbThreadService.Thread.uid;
+
 
         private IEventAggregator _eventAggregator;
         public IFbThreadService FbThreadService { get; set; }
@@ -69,6 +72,18 @@ namespace MediaHandler.ViewModels
             }
         }
 
+        private string _chatMessage;
+        public string ChatMessage
+        {
+            get => _chatMessage;
+            set
+            {
+                if (_chatMessage == value) return;
+                _chatMessage = value;
+                NotifyOfPropertyChange(() => ChatMessage);
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -77,9 +92,9 @@ namespace MediaHandler.ViewModels
         {
             MessageCollection = new BindableCollection<MessageModel>();
             var lastMessages = await FbThreadService.GetLastMessages();
-            foreach (var lastMessage in lastMessages)
+            foreach (var lastMessage in lastMessages.Reverse())
             {
-                var newMessage = new NewMessageStruct(FbThreadService.Thread.uid, lastMessage);
+                var newMessage = new NewMessageStruct(ThreadId, lastMessage);
                 Handle(new ThreadNotification<NewMessageStruct>(newMessage));
             }
         }
@@ -96,34 +111,45 @@ namespace MediaHandler.ViewModels
             _scrollViewerLogic.ScrollToDown();
         }
 
-        public void SendChatMessage(string message)
+        public void SendChatMessage()
         {
-            Console.WriteLine(message);
+            var message = new FB_Message(ChatMessage, is_from_me: true, thread_id: ThreadId);
+            FbThreadService.SendMessage(message);
+
+            // var messageStruct = new NewMessageStruct(ThreadId, message);
+            // Handle(new ThreadNotification<NewMessageStruct>(messageStruct));
+            //TODO Create a buffer for messages to show them quicker or if a message has not been sent successfully then mark it
         }
         #endregion Methods
 
         public void Handle([NotNull] IThreadNotification<NewMessageStruct> message)
         {
-            if (!message.Obj.ThreadId.Equals(FbThreadService.Thread.uid,
+            var messageShort = message.Obj.Message;
+            if (!message.Obj.ThreadId.Equals(ThreadId,
                 StringComparison.OrdinalIgnoreCase)) return;
+
+            var newMessage = new MessageModel()
+            {
+                Color = FriendColor,
+                IsOwnMessage = FbThreadService.AmIAuthor(messageShort.author),
+                Time = DateTime.Now,
+                Texts = { messageShort.text }
+            };
 
             if (MessageCollection.Count <= 0)
             {
-
+                MessageCollection.Add(newMessage);
                 return;
             }
 
             var lastMessage = MessageCollection[MessageCollection.Count - 1];
-            if (lastMessage.IsOwnMessage)
+            if (lastMessage.IsOwnMessage != FbThreadService.AmIAuthor(messageShort.author))
             {
-                MessageCollection.Add(new MessageModel()
-                {
-                    Color = FriendColor, IsOwnMessage = false, Time = DateTime.Now, Texts = { message.Obj.Message.text }
-                });
+                MessageCollection.Add(newMessage);
             }
             else
             {
-                lastMessage.Texts.Add(message.Obj.Message.text);
+                lastMessage.Texts.Add(messageShort.text);
             }
         }
 

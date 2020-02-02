@@ -22,6 +22,7 @@ namespace MediaHandler.Services
             _eventAggregator = eventAggregator;
         }
 
+        
         protected override Task onMessage(string mid = null, string author_id = null, string message = null, FB_Message message_object = null,
             string thread_id = null, ThreadType? thread_type = null, long ts = 0, JToken metadata = null, JToken msg = null)
         {

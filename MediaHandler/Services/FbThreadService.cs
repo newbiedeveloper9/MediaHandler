@@ -16,6 +16,11 @@ namespace MediaHandler.Services
             _fbClient = fbClient;
         }
 
+        public bool AmIAuthor(string author)
+        {
+            return author == _fbClient.GetUserUid();
+        }
+
         public async Task SendMessage(FB_Message message)
         {
             await _fbClient.send(message, Thread.uid, Thread.type);

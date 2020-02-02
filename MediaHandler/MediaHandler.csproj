@@ -158,6 +158,11 @@
     <Compile Include="Converters\NullImageConverter.cs" />
     <Compile Include="Extensions\FixWpfHeader.cs" />
     <Compile Include="Extensions\SecureStringExtension.cs" />
+    <Compile Include="Input\CallViewmodelMethod.cs" />
+    <Compile Include="Input\KeySequence.cs" />
+    <Compile Include="Input\KeyTrigger.cs" />
+    <Compile Include="Input\MultiKeyGesture.cs" />
+    <Compile Include="Input\MultiKeyGestureConverter.cs" />
     <Compile Include="Interfaces\IThread.cs" />
     <Compile Include="Interfaces\IFbThreadService.cs" />
     <Compile Include="IShell.cs" />

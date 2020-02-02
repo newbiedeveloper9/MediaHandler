@@ -9,5 +9,6 @@ namespace MediaHandler.Interfaces
         FB_Thread Thread { get; set; }
         Task SendMessage(FB_Message message);
         Task<IList<FB_Message>> GetLastMessages(int amount = 10);
+        bool AmIAuthor(string messageAuthor);
     }
 }
