@@ -16,17 +16,15 @@ using SharpDj.Logic.UI;
 
 namespace MediaHandler.ViewModels
 {
-    public class ThreadViewModel : PropertyChangedBase, IThread,
-        IHandle<IThreadNotification<NewMessageStruct>>, IDeactivate,
-        IDisposable
+    public partial class ThreadViewModel : PropertyChangedBase, IThread,
+        IHandle<IThreadNotification<NewMessageStruct>>
     {
-        bool disposed = false;
-
         private ScrollViewerLogic _scrollViewerLogic;
         private string ThreadId => FbThreadService.Thread.uid;
 
-
         private IEventAggregator _eventAggregator;
+        private readonly IFbLocalProfile _fbLocalProfile;
+
         public IFbThreadService FbThreadService { get; set; }
         public SolidColorBrush MyColor { get; set; } = new SolidColorBrush(Colors.Purple);
         public SolidColorBrush FriendColor { get; set; } = new SolidColorBrush(Colors.Green);
@@ -37,9 +35,10 @@ namespace MediaHandler.ViewModels
 
         }
 
-        public ThreadViewModel(IEventAggregator eventAggregator, IFbThreadService fbService)
+        public ThreadViewModel(IEventAggregator eventAggregator, IFbThreadService fbService, IFbLocalProfile fbLocalProfile)
         {
             _eventAggregator = eventAggregator;
+            _fbLocalProfile = fbLocalProfile;
             _eventAggregator.Subscribe(this);
 
             FbThreadService = fbService;
@@ -60,15 +59,15 @@ namespace MediaHandler.ViewModels
             }
         }
 
-        private BindableCollection<MessageModel> _messageCollection;
-        public BindableCollection<MessageModel> MessageCollection
+        private BindableCollection<MessageModel> _messageColumnCollection;
+        public BindableCollection<MessageModel> MessageColumnCollection
         {
-            get => _messageCollection;
+            get => _messageColumnCollection;
             set
             {
-                if (_messageCollection == value) return;
-                _messageCollection = value;
-                NotifyOfPropertyChange(() => MessageCollection);
+                if (_messageColumnCollection == value) return;
+                _messageColumnCollection = value;
+                NotifyOfPropertyChange(() => MessageColumnCollection);
             }
         }
 
@@ -90,13 +89,15 @@ namespace MediaHandler.ViewModels
 
         public async Task Initialize()
         {
-            MessageCollection = new BindableCollection<MessageModel>();
+            MessageColumnCollection = new BindableCollection<MessageModel>();
             var lastMessages = await FbThreadService.GetLastMessages();
             foreach (var lastMessage in lastMessages.Reverse())
             {
                 var newMessage = new NewMessageStruct(ThreadId, lastMessage);
-                Handle(new ThreadNotification<NewMessageStruct>(newMessage));
+                HandleNewMessage(new ThreadNotification<NewMessageStruct>(newMessage), false, true);
             }
+
+            await BackgroundBuffer();
         }
 
         public void ScrollLoaded(ScrollViewer scrollViewer)
@@ -111,84 +112,72 @@ namespace MediaHandler.ViewModels
             _scrollViewerLogic.ScrollToDown();
         }
 
-        public void SendChatMessage()
+        public async void SendChatMessage()
         {
-            var message = new FB_Message(ChatMessage, is_from_me: true, thread_id: ThreadId);
-            FbThreadService.SendMessage(message);
+            var message = new FB_Message(ChatMessage, is_from_me: true, thread_id: ThreadId, author: _fbLocalProfile.AuthorId);
 
-            // var messageStruct = new NewMessageStruct(ThreadId, message);
-            // Handle(new ThreadNotification<NewMessageStruct>(messageStruct));
+            var messageStruct = new NewMessageStruct(ThreadId, message);
+            HandleNewMessage(new ThreadNotification<NewMessageStruct>(messageStruct), true);
+
+            await FbThreadService.SendMessage(message);
+
             //TODO Create a buffer for messages to show them quicker or if a message has not been sent successfully then mark it
         }
         #endregion Methods
 
-        public void Handle([NotNull] IThreadNotification<NewMessageStruct> message)
-        {
-            var messageShort = message.Obj.Message;
-            if (!message.Obj.ThreadId.Equals(ThreadId,
-                StringComparison.OrdinalIgnoreCase)) return;
+        #region Handlers
 
+        public void Handle(IThreadNotification<NewMessageStruct> message) => HandleNewMessage(message);
+
+        private void HandleNewMessage(IThreadNotification<NewMessageStruct> message, bool isLocal = false, bool isInitialize = false)
+        {
+            var messageParam = message.Obj.Message;
+            if (!message.Obj.ThreadId.Equals(ThreadId)) return;
+
+            var simpleMessage = new SimpleMessage(messageParam.text, DateTime.Now);
             var newMessage = new MessageModel()
             {
-                Color = FriendColor,
-                IsOwnMessage = FbThreadService.AmIAuthor(messageShort.author),
+                IsOwnMessage = FbThreadService.AmIAuthor(messageParam.author),
                 Time = DateTime.Now,
-                Texts = { messageShort.text }
+                SimpleMessageCollection = { simpleMessage }
             };
+            newMessage.Color = newMessage.IsOwnMessage ? MyColor : FriendColor;
 
-            if (MessageCollection.Count <= 0)
+            if (MessageColumnCollection.Count <= 0)
             {
-                MessageCollection.Add(newMessage);
+                MessageColumnCollection.Add(newMessage);
+                if(isLocal)
+                    _messageBuffer.Add(simpleMessage);
                 return;
             }
 
-            var lastMessage = MessageCollection[MessageCollection.Count - 1];
-            if (lastMessage.IsOwnMessage != FbThreadService.AmIAuthor(messageShort.author))
+            var lastMessageColumn = MessageColumnCollection[MessageColumnCollection.Count - 1];
+            if (isLocal)
             {
-                MessageCollection.Add(newMessage);
+                if (lastMessageColumn.IsOwnMessage != newMessage.IsOwnMessage)
+                    MessageColumnCollection.Add(newMessage);
+                else
+                    lastMessageColumn.SimpleMessageCollection.Add(simpleMessage);
+
+                _messageBuffer.Add(simpleMessage);
+                return;
+            }
+
+            if (lastMessageColumn.IsOwnMessage != newMessage.IsOwnMessage)
+            {
+                MessageColumnCollection.Add(newMessage);
             }
             else
             {
-                lastMessage.Texts.Add(messageShort.text);
+                if (newMessage.IsOwnMessage && !isInitialize)
+                {
+                    SetMessageSuccess(simpleMessage.Message);
+                    return;
+                }
+
+                lastMessageColumn.SimpleMessageCollection.Add(simpleMessage);
             }
         }
-
-        #region CloseWindow
-        public void Deactivate(bool close)
-        {
-            Dispose();
-        }
-
-        public event EventHandler<DeactivationEventArgs> AttemptingDeactivation;
-        public event EventHandler<DeactivationEventArgs> Deactivated;
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposed)
-                return;
-
-            if (disposing)
-            {
-                _eventAggregator.Unsubscribe(this);
-                _eventAggregator = null;
-                FbThreadService.Thread = null;
-                FbThreadService = null;
-                _scrollViewerLogic = null;
-            }
-
-            disposed = true;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        ~ThreadViewModel()
-        {
-            Dispose(false);
-        }
-        #endregion CloseWindow
+        #endregion Handlers
     }
 }

@@ -25,6 +25,7 @@ namespace MediaHandler {
             container.Singleton<FbClient, FbClient>();
             container.Singleton<IFbService, FbService>();
             container.PerRequest<IFbThreadService, FbThreadService>();
+            container.Singleton<IFbLocalProfile, FbLocalProfile>();
 
             container.PerRequest<IShell, ShellViewModel>();
             container.PerRequest<IThread, ThreadViewModel>();

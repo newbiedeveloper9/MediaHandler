@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows.Media;
 using Caliburn.Micro;
 
@@ -7,15 +6,16 @@ namespace MediaHandler.Models
 {
     public class MessageModel : PropertyChangedBase
     {
-        private BindableCollection<string> _texts = new BindableCollection<string>();
-        public BindableCollection<string> Texts
+        private BindableCollection<SimpleMessage> _simpleMessageCollection
+            = new BindableCollection<SimpleMessage>();
+        public BindableCollection<SimpleMessage> SimpleMessageCollection
         {
-            get => _texts;
+            get => _simpleMessageCollection;
             set
             {
-                if (_texts == value) return;
-                _texts = value;
-                NotifyOfPropertyChange(() => Texts);
+                if (_simpleMessageCollection == value) return;
+                _simpleMessageCollection = value;
+                NotifyOfPropertyChange(() => SimpleMessageCollection);
             }
         }
 

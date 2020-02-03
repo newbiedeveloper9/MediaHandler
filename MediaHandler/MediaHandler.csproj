@@ -163,13 +163,16 @@
     <Compile Include="Input\KeyTrigger.cs" />
     <Compile Include="Input\MultiKeyGesture.cs" />
     <Compile Include="Input\MultiKeyGestureConverter.cs" />
+    <Compile Include="Interfaces\IFbLocalProfile.cs" />
     <Compile Include="Interfaces\IThread.cs" />
     <Compile Include="Interfaces\IFbThreadService.cs" />
     <Compile Include="IShell.cs" />
     <Compile Include="Models\MessageModel.cs" />
+    <Compile Include="Models\SimpleMessageModel.cs" />
     <Compile Include="Models\ThreadPreviewModel.cs" />
     <Compile Include="PubSub\NewMessageStruct.cs" />
     <Compile Include="Services\FbClient.cs" />
+    <Compile Include="Services\FbLocalProfile.cs" />
     <Compile Include="Services\FbService.cs" />
     <Compile Include="Services\FbThreadService.cs" />
     <Compile Include="Services\ScrollViewerLogic.cs" />
@@ -181,6 +184,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModels\ThreadViewModelDispose.cs" />
+    <Compile Include="ViewModels\ThreadViewModelMessageBuffer.cs" />
     <Compile Include="Views\ThreadView.xaml.cs">
       <DependentUpon>ThreadView.xaml</DependentUpon>
     </Compile>

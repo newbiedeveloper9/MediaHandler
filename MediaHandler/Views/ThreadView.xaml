@@ -44,11 +44,11 @@
                 materialDesign:ThemeAssist.Theme="Light"
                 cal:Message.Attach="[Event Loaded]=[Action ScrollLoaded($source)]">
                 <StackPanel Margin="0 8 0 12">
-                    <ItemsControl x:Name="MessageCollection" >
+                    <ItemsControl x:Name="MessageColumnCollection" >
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="models:MessageModel">
                                 <StackPanel>
-                                    <ItemsControl ItemsSource="{Binding Texts}" x:Name="Texts"
+                                    <ItemsControl ItemsSource="{Binding SimpleMessageCollection}" x:Name="SimpleMessageCollection"
                                                   HorizontalAlignment="{Binding IsOwnMessage, Converter={StaticResource AuthorToHorizontalAlignment}}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
@@ -58,15 +58,14 @@
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth1" 
-                                                                     Background="{Binding ElementName=Texts, Path=DataContext.Color}"
-                                                                         MaxWidth="220" Margin="10 1 10 1"
-                                                                     HorizontalAlignment="{Binding ElementName=Texts, Path=DataContext.IsOwnMessage,
-                                                                 Converter={StaticResource AuthorToHorizontalAlignment}}"
-                                                                         Padding="4" UniformCornerRadius="10" UseLayoutRounding="False" SnapsToDevicePixels="False">
-                                                        <TextBox Margin="5 3 5 3" FontSize="16" Style="{StaticResource TextboxChat}" 
-                                                                 MaxWidth="220"
-                                                              
-                                                                 Foreground="White" Text="{Binding Mode=OneTime}"/>
+                                                                     Background="{Binding ElementName=SimpleMessageCollection, Path=DataContext.Color}"
+                                                                     MaxWidth="220" Margin="10 1 10 1"
+                                                                     HorizontalAlignment="{Binding ElementName=SimpleMessageCollection, Path=DataContext.IsOwnMessage,
+                                                                        Converter={StaticResource AuthorToHorizontalAlignment}}"
+                                                                     Padding="4" UniformCornerRadius="10" UseLayoutRounding="False" SnapsToDevicePixels="False">
+
+                                                    <TextBox Margin="5 3 5 3" FontSize="16" Style="{StaticResource TextboxChat}" 
+                                                             MaxWidth="220" Foreground="White" Text="{Binding Message, Mode=OneTime}"/>
                                                     </materialDesign:Card>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -74,7 +73,7 @@
 
                                     <Polygon  VerticalAlignment="Bottom" Points="5,-1.9   20,-1.9   10,-12" Margin="1 0 4 0"  
                                               HorizontalAlignment="{Binding IsOwnMessage, Converter={StaticResource AuthorToHorizontalAlignment}}"
-                                              StrokeThickness="0" Fill="{Binding Color}" Opacity="0.95">
+                                              StrokeThickness="0" Fill="{Binding Color}">
                                     </Polygon>
                                 </StackPanel>
                             </DataTemplate>
