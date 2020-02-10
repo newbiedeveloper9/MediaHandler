@@ -23,16 +23,6 @@ namespace MediaHandler.Services
             _fbClient = fbClient;
         }
 
-        public async Task<bool> Login(string login, SecureString password)
-        {
-            var result = await _fbClient.TryLogin();
-            if(!result) 
-                result = await _fbClient.DoLogin(login, password.Password());
-            if (result)
-                await _fbClient.StartListening();
-            return result;
-        }
-
         public async Task<IList<FB_Thread>> GetLastThreads(int amount = 10)
         {
             return await _fbClient.fetchThreadList(amount);

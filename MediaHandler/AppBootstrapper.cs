@@ -7,28 +7,34 @@ using MediaHandler.ViewModels;
 using System;
 using System.Collections.Generic;
 using Caliburn.Micro;
+using MediaHandler.Views;
 
 namespace MediaHandler {
     public class AppBootstrapper : BootstrapperBase {
-        SimpleContainer container;
+        private SimpleContainer _container;
 
         public AppBootstrapper() {
             Initialize();
         }
 
         protected override void Configure() {
-            container = new SimpleContainer();
+            _container = new SimpleContainer();
 
-            container.Singleton<IWindowManager, WindowManager>();
-            container.Singleton<IEventAggregator, EventAggregator>();
+            _container.Singleton<IWindowManager, WindowManager>();
+            _container.Singleton<IEventAggregator, EventAggregator>();
 
-            container.Singleton<FbClient, FbClient>();
-            container.Singleton<IFbService, FbService>();
-            container.PerRequest<IFbThreadService, FbThreadService>();
-            container.Singleton<IFbLocalProfile, FbLocalProfile>();
+            //Services
+            _container.Singleton<FbClient, FbClient>();
+            _container.Singleton<IFbService, FbService>();
+            _container.PerRequest<IFbThreadService, FbThreadService>();
+            _container.Singleton<IFbLocalProfile, FbLocalProfile>();
+            _container.Singleton<IFbLoginService, FbLoginService>();
 
-            container.PerRequest<IShell, ShellViewModel>();
-            container.PerRequest<IThread, ThreadViewModel>();
+            //ViewModels
+            _container.Singleton<MasterViewModel, MasterViewModel>();
+            _container.PerRequest<ShellViewModel, ShellViewModel>();
+            _container.PerRequest<LoginViewModel, LoginViewModel>();
+            _container.PerRequest<IThread, ThreadViewModel>();
 
             KeysAndGestures();
         }
@@ -41,15 +47,14 @@ namespace MediaHandler {
             Parser.CreateTrigger = (target, triggerText) =>
             {
                 if (triggerText == null)
-                {
                     return defaultCreateTrigger(target, null);
-                }
 
                 var triggerDetail = triggerText
                     .Replace("[", string.Empty)
                     .Replace("]", string.Empty);
 
-                var splits = triggerDetail.Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
+                var splits = triggerDetail
+                    .Split((char[])null, StringSplitOptions.RemoveEmptyEntries);
 
                 switch (splits[0])
                 {
@@ -67,20 +72,20 @@ namespace MediaHandler {
         }
 
         protected override object GetInstance(Type service, string key) {
-            return container.GetInstance(service, key);
+            return _container.GetInstance(service, key);
         }
 
         protected override IEnumerable<object> GetAllInstances(Type service) {
-            return container.GetAllInstances(service);
+            return _container.GetAllInstances(service);
         }
 
         protected override void BuildUp(object instance) {
-            container.BuildUp(instance);
+            _container.BuildUp(instance);
         }
 
         protected override void OnStartup(object sender, System.Windows.StartupEventArgs e) {
             FixWpfHeader.UnsetRestrictedHeaders();
-            DisplayRootViewFor<IShell>();
+            DisplayRootViewFor<MasterViewModel>();
         }
     }
 }

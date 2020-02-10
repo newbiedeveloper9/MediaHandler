@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace MediaHandler
 {
-    public class ThreadNotification<T> : IThreadNotification<T>
+    public class SubNotification<T> : ISubNotification<T>
     {
         public T Obj { get; set; }
 
-        public ThreadNotification(T obj)
+        public SubNotification(T obj)
         {
             Obj = obj;
         }
     }
     
-    public interface IThreadNotification<T>
+    public interface ISubNotification<T>
     {
         T Obj { get; set; }
     }

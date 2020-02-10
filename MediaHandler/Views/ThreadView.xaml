@@ -96,8 +96,8 @@
                          SpellCheck.IsEnabled="True"
                          x:Name="ChatMessage"
                          cal:Message.Attach="[Key Enter]=[Action SendChatMessage()];"
+                         PreviewKeyDown="ChatMessage_OnPreviewKeyDown"
                          materialDesign:HintAssist.Hint="Wpisz wiadomość..."/>
-            <!--PreviewKeyDown="Message_OnPreviewKeyDown"-->
         </Grid>
     </materialDesign:Card>
 </UserControl>

@@ -28,7 +28,7 @@ namespace MediaHandler.Services
         {
             var newMessage = new NewMessageStruct(thread_id, message_object);
             _eventAggregator.BeginPublishOnUIThread(
-                new ThreadNotification<NewMessageStruct>(newMessage));
+                new SubNotification<NewMessageStruct>(newMessage));
             return base.onMessage(mid, author_id, message, message_object, thread_id, thread_type, ts, metadata, msg);
         }
 

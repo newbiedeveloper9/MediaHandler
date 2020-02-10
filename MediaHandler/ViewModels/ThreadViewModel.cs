@@ -17,7 +17,7 @@ using SharpDj.Logic.UI;
 namespace MediaHandler.ViewModels
 {
     public partial class ThreadViewModel : PropertyChangedBase, IThread,
-        IHandle<IThreadNotification<NewMessageStruct>>
+        IHandle<ISubNotification<NewMessageStruct>>
     {
         private ScrollViewerLogic _scrollViewerLogic;
         private string ThreadId => FbThreadService.Thread.uid;
@@ -89,12 +89,13 @@ namespace MediaHandler.ViewModels
 
         public async Task Initialize()
         {
+            Console.WriteLine(FbThreadService.Thread.message_count);
             MessageColumnCollection = new BindableCollection<MessageModel>();
             var lastMessages = await FbThreadService.GetLastMessages();
             foreach (var lastMessage in lastMessages.Reverse())
             {
                 var newMessage = new NewMessageStruct(ThreadId, lastMessage);
-                HandleNewMessage(new ThreadNotification<NewMessageStruct>(newMessage), false, true);
+                HandleNewMessage(new SubNotification<NewMessageStruct>(newMessage), false, true);
             }
 
             await BackgroundBuffer();
@@ -114,22 +115,22 @@ namespace MediaHandler.ViewModels
 
         public async void SendChatMessage()
         {
+            if (string.IsNullOrWhiteSpace(ChatMessage)) return;
             var message = new FB_Message(ChatMessage, is_from_me: true, thread_id: ThreadId, author: _fbLocalProfile.AuthorId);
+            ChatMessage = string.Empty;
 
             var messageStruct = new NewMessageStruct(ThreadId, message);
-            HandleNewMessage(new ThreadNotification<NewMessageStruct>(messageStruct), true);
+            HandleNewMessage(new SubNotification<NewMessageStruct>(messageStruct), true);
 
             await FbThreadService.SendMessage(message);
-
-            //TODO Create a buffer for messages to show them quicker or if a message has not been sent successfully then mark it
         }
         #endregion Methods
 
         #region Handlers
 
-        public void Handle(IThreadNotification<NewMessageStruct> message) => HandleNewMessage(message);
+        public void Handle(ISubNotification<NewMessageStruct> message) => HandleNewMessage(message);
 
-        private void HandleNewMessage(IThreadNotification<NewMessageStruct> message, bool isLocal = false, bool isInitialize = false)
+        private void HandleNewMessage(ISubNotification<NewMessageStruct> message, bool isLocal = false, bool isInitialize = false)
         {
             var messageParam = message.Obj.Message;
             if (!message.Obj.ThreadId.Equals(ThreadId)) return;

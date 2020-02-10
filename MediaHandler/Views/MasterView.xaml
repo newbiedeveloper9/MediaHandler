@@ -1,0 +1,18 @@
+﻿<Window x:Class="MediaHandler.Views.MasterView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MediaHandler.Views"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewModels="clr-namespace:MediaHandler.ViewModels"
+        mc:Ignorable="d" 
+        d:DataContext="{d:DesignInstance Type=viewModels:MasterViewModel, IsDesignTimeCreatable=True}"
+        Title="MasterView" Height="600" Width="640">
+    <Grid>
+        <ContentControl x:Name="ActiveItem"/>
+
+         <materialDesign:Snackbar VerticalAlignment="Bottom" HorizontalAlignment="Center" 
+                                  MessageQueue="{Binding MessagesQueue}"/> 
+    </Grid>
+</Window>

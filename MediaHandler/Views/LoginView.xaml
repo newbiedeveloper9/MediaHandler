@@ -1,0 +1,57 @@
+﻿<UserControl x:Class="MediaHandler.Views.LoginView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MediaHandler.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:input="clr-namespace:MediaHandler.Input"
+             cal:Bind.AtDesignTime="True"
+             d:DesignHeight="700" d:DesignWidth="1300">
+    <Grid Background="#1c1c1c">
+        <StackPanel VerticalAlignment="Center" Margin="0 0 0 24" HorizontalAlignment="Center">
+            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth5" Padding="32" Background="#232323">
+                <StackPanel>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" Margin="25">
+                        <Grid>
+                            <TextBlock Text="Media Handler" x:Name="appName" FontSize="32" Foreground="{StaticResource PrimaryHueMidBrush}" HorizontalAlignment="Center" Margin="3 2 0 0"/>
+                            <TextBlock Text="{Binding ElementName=appName, Path=Text}" FontSize="32" Foreground="{StaticResource PrimaryHueDarkForegroundBrush}" HorizontalAlignment="Center"/>
+                        </Grid>
+                        <StackPanel>
+                            <Grid HorizontalAlignment="Center" Margin="0 10 0 0">
+                                <TextBlock Text="Messenger Handler that helps to stay with friends"  x:Name="title" FontSize="16" FontWeight="DemiBold" Foreground="{StaticResource PrimaryHueDarkBrush}" Opacity="0.4" Margin="2 2 0 0"/>
+                                <TextBlock Text="{Binding ElementName=title, Path=Text}" FontSize="16" FontWeight="DemiBold" Foreground="{StaticResource PrimaryHueMidForegroundBrush}" Opacity="0.6"/>
+                            </Grid>
+                            <Grid HorizontalAlignment="Center" Margin="0 0 0 0">
+                                <TextBlock Text="while playing games or doing other weird things." x:Name="description" FontSize="16" FontWeight="DemiBold" Foreground="{StaticResource PrimaryHueDarkBrush}" Opacity="0.4" Margin="2 2 0 0"/>
+                                <TextBlock Text="{Binding ElementName=description, Path=Text}" FontSize="16" FontWeight="DemiBold" Foreground="{StaticResource PrimaryHueMidForegroundBrush}" Opacity="0.6"/>
+                            </Grid>
+                        </StackPanel>
+
+                    </StackPanel>
+                    <StackPanel Margin="0 24 0 0">
+                        <TextBlock Text="Email or phone number" Foreground="{StaticResource PrimaryHueDarkForegroundBrush}" cal:Message.Attach="[Key Enter]=[TryLogin]"
+                           Margin="0 0 0 6" HorizontalAlignment="Left" Opacity="0.6" FontWeight="Bold" FontSize="12"/>
+                        <TextBox  x:Name="LoginText" Foreground="{StaticResource PrimaryHueDarkForegroundBrush}"/>
+                    </StackPanel>
+                    <StackPanel Margin="0 24 0 0">
+                        <TextBlock Text="Password" Foreground="{StaticResource PrimaryHueDarkForegroundBrush}" cal:Message.Attach="[Key Enter]=[TryLogin]"
+                           Margin="0 0 0 6" HorizontalAlignment="Left" Opacity="0.6" FontWeight="Bold" FontSize="12"/>
+                        <PasswordBox x:Name="PasswordText" Foreground="{StaticResource PrimaryHueDarkForegroundBrush}">
+                            <i:Interaction.Behaviors>
+                                <input:PasswordBoxBindingBehavior Password="{Binding PasswordText}"/>
+                            </i:Interaction.Behaviors>
+                        </PasswordBox>
+                    </StackPanel>
+
+                    <Button Margin="0 12 0 0" x:Name="TryLogin">
+                        <TextBlock Text="Login" VerticalAlignment="Center" materialDesign:ThemeAssist.Theme="Light"/>
+                    </Button>
+                </StackPanel>
+            </materialDesign:Card>
+        </StackPanel>
+    </Grid>
+</UserControl>

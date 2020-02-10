@@ -11,14 +11,16 @@ using System.Windows;
 using System.Windows.Media;
 using Caliburn.Micro;
 using JetBrains.Annotations;
+using MaterialDesignThemes.Wpf;
 using MediaHandler;
 using MediaHandler.Interfaces;
 using MediaHandler.Models;
+using MediaHandler.PubSub;
 using MediaHandler.Services;
 
 namespace MediaHandler.ViewModels
 {
-    public class ShellViewModel : Conductor<object>, IShell
+    public class ShellViewModel : PropertyChangedBase
     {
         private readonly IWindowManager _windowManager;
         private readonly IFbService _fbService;
@@ -56,8 +58,6 @@ namespace MediaHandler.ViewModels
 
         private async Task Initialize()
         {
-            await Login();
-
             ThreadCollection = new BindableCollection<ThreadPreviewModel>();
 
             var threads = await _fbService.GetLastThreads(20);
@@ -73,24 +73,11 @@ namespace MediaHandler.ViewModels
             }
         }
 
-        private async Task Login()
-        {
-            var result = await _fbService.Login("", null);
-            if (result) return;
-
-            //TODO create form for login
-            Console.WriteLine("Login: ");
-            var login = Console.ReadLine();
-            Console.WriteLine("Password: ");
-            var secureString = new NetworkCredential("", Console.ReadLine()).SecurePassword;
-            await _fbService.Login(login, secureString);
-        }
-
-        public void OpenThread([NotNull] ThreadPreviewModel threadModel)
+        public async void OpenThread(ThreadPreviewModel threadModel)
         {
             var chatViewModel = IoC.Get<IThread>();
             chatViewModel.FbThreadService.Thread = threadModel.Thread;
-            chatViewModel.Initialize();
+            await chatViewModel.Initialize();
 
             _windowManager.ShowWindow(chatViewModel);
         }
